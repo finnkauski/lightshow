@@ -1,4 +1,4 @@
-# Lightshow :traffic-light:
+# Lightshow 🚥
 
 Make use of your Hue lights and set up a lightshow!
 
