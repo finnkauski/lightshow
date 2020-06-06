@@ -4,7 +4,10 @@ a: seq = {
     wait  2;
     color ff0000;
 };
+
 b: seq = {
     color 00ff00;
     wait  2;
 };
+
+c: act = color 00ff00;
