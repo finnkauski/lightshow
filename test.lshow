@@ -1,8 +1,5 @@
 a: seq = {
     blink 1 2 ff0000;
-    color 00ff00;
-    wait  2;
-    color ff0000;
 };
 
 b: seq = {
@@ -10,4 +7,11 @@ b: seq = {
     wait  2;
 };
 
-c: act = color 00ff00;
+trigger b;
+
+b: seq = {
+    wait  2;
+};
+
+trigger b;
+trigger a;
