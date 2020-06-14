@@ -1,20 +1,65 @@
-use super::*;
+use super::lshow::*;
 use actions::action;
+use directives::directive;
+use midi_binds::mbind;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::character::complete::{
     alphanumeric1, digit1, hex_digit1, multispace0, newline, space0, space1,
 };
-use nom::combinator::map;
+use nom::combinator::{all_consuming, map};
 use nom::multi::many0;
 use nom::sequence::{delimited, pair, preceded, terminated, tuple};
 use nom::IResult;
 use sequences::sequence;
 use statements::trigger;
 
+/// Midi Binds
+mod midi_binds {
+    use super::{
+        alphanumeric1, helpers::*, map, preceded, tag, terminated, tuple, Entity, IResult,
+    };
+
+    pub fn mbind(i: &str) -> IResult<&str, Entity> {
+        let mbind_params = tuple((u8_digit_sp, alphanumeric1));
+        map(
+            terminated(preceded(tag("mbind "), mbind_params), colon),
+            Entity::MidiBind,
+        )(i)
+    }
+}
+
+/// File level directives
+mod directives {
+    use super::{
+        alphanumeric1, helpers::colon, map, preceded, tag, terminated, DirectiveType, Entity,
+        IResult,
+    };
+
+    /// Parse a #:>
+    pub fn dir_id(i: &str) -> IResult<&str, &str> {
+        tag("#:> ")(i)
+    }
+    /// Directive name
+    pub fn directive(i: &str) -> IResult<&str, Entity> {
+        let dir = |i| Entity::Directive(DirectiveType::from(i));
+        map(terminated(preceded(dir_id, alphanumeric1), colon), dir)(i)
+    }
+}
+
 /// Helper parsers
 mod helpers {
     use super::{digit1, map, multispace0, preceded, space1, tag, terminated, IResult};
+
+    /// Parse a u8 digit
+    pub fn u8_digit(i: &str) -> IResult<&str, u8> {
+        map(digit1, move |s: &str| s.parse::<u8>().unwrap())(i)
+    }
+
+    /// Parse a u8 digit followed by
+    pub fn u8_digit_sp(i: &str) -> IResult<&str, u8> {
+        terminated(u8_digit, space1)(i)
+    }
 
     /// Parse a u16 digit
     pub fn u16_digit(i: &str) -> IResult<&str, u16> {
@@ -145,6 +190,7 @@ mod sequences {
     }
 }
 
+/// Statements parsers
 mod statements {
     use super::helpers::*;
     use super::*;
@@ -161,6 +207,9 @@ mod statements {
 }
 
 /// Root parser for the whole documents
-pub fn root(i: &str) -> IResult<&str, Vec<Entity>> {
-    many0(terminated(alt((trigger, sequence, action)), many0(newline)))(i)
+pub fn root(i: &str) -> IResult<&str, Entities> {
+    all_consuming(many0(terminated(
+        alt((trigger, sequence, action, directive, mbind)),
+        many0(newline),
+    )))(i)
 }

@@ -1,17 +1,9 @@
-a: seq = {
-    blink 1 2 ff0000;
-};
-
-b: seq = {
+#:> midi;
+c: seq = {
+    color ff0000;
+    wait 1;
     color 00ff00;
-    wait  2;
+    wait 1;
+    color 0000ff;
 };
-
-trigger b;
-
-b: seq = {
-    wait  2;
-};
-
-trigger b;
-trigger a;
+mbind 42 c;
