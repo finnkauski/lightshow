@@ -19,3 +19,41 @@ to try parser combinators.
 
 This project is essentially me learning parser combinators by writing a scripting language that my
 lights can interpret and that I can later map to my drums.
+
+## Usage
+
+1. Clone the repository.
+2. `cargo install --path .`
+3. `lshow ../path/to/file.lshow`
+
+The following are example syntax for the language.
+
+### Individual actions
+
+- change color to the given hex color - `color <hex_color>`
+- blink lights - `blink <n_times> <pause_between> <hex_color>`
+- wait for n seconds `wait <n_seconds>`
+
+You can assign an action to a variable as follows:
+
+```
+variable_action: act = color ff0000;
+```
+
+This defines a sequence of individual `actions` or commands to your lights.
+
+```
+variable_sequence: seq = {
+    color ff0000;
+    wait 1;
+    color 00ff00;
+    wait 1;
+    color 0000ff;
+};
+```
+
+And finally the way to trigger the saved actions or sequences is by using the `trigger` statement.
+
+```
+trigger variable_sequence;
+```

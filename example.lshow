@@ -1,8 +1,10 @@
 c: seq = {
     color ff0000;
     wait 1;
-    color 00ff00;
+    blink 2 1 ff0000;
     wait 1;
     color 0000ff;
 };
+a: act = color 00ff00;
 trigger c;
+trigger a;

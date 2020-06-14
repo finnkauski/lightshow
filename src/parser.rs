@@ -16,16 +16,6 @@ use statements::trigger;
 mod helpers {
     use super::{digit1, map, multispace0, preceded, space1, tag, terminated, IResult};
 
-    /// Parse a u8 digit
-    pub fn u8_digit(i: &str) -> IResult<&str, u8> {
-        map(digit1, move |s: &str| s.parse::<u8>().unwrap())(i)
-    }
-
-    /// Parse a u8 digit followed by
-    pub fn u8_digit_sp(i: &str) -> IResult<&str, u8> {
-        terminated(u8_digit, space1)(i)
-    }
-
     /// Parse a u16 digit
     pub fn u16_digit(i: &str) -> IResult<&str, u16> {
         map(digit1, move |s: &str| s.parse::<u16>().unwrap())(i)
