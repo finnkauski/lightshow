@@ -1,4 +1,3 @@
-use super::midi::Pad;
 use lighthouse::{hue::HueBridge, state};
 use std::collections::HashMap;
 
@@ -13,10 +12,6 @@ pub type Variable<'a> = (VariableName<'a>, VariableType);
 /// Type alias for multiple parsed variables
 pub type Variables<'a> = HashMap<VariableName<'a>, Entity<'a>>;
 
-/// Type alias for multiple parsed variables
-/// Allows to bind sequences to midi triggers
-pub type MidiBinds<'a> = HashMap<Pad, VariableName<'a>>;
-
 /// Type alias for a vector of actions
 pub type Sequence<'a> = Vec<Action<'a>>;
 
@@ -26,27 +21,6 @@ pub type Sequence<'a> = Vec<Action<'a>>;
 pub enum StatementType<'a> {
     Trigger(&'a str),
 }
-
-/// # DirectiveType
-/// File level directives that change the behaviour of the language
-#[derive(Debug, Eq, PartialEq)]
-pub enum DirectiveType {
-    Midi,
-}
-
-/// This is required to convert the text to possible directive types
-/// TODO: move this conversion into our parsers
-impl From<&str> for DirectiveType {
-    fn from(i: &str) -> DirectiveType {
-        match i {
-            "midi" => DirectiveType::Midi,
-            _ => panic!("Unknown directive"),
-        }
-    }
-}
-
-/// Directives - a set of directives that alter the behaviour of the system
-pub type Directives = Vec<DirectiveType>;
 
 /// # Type System
 /// Currently the only possible types for variables are
@@ -81,9 +55,7 @@ pub type Entities<'a> = Vec<Entity<'a>>;
 pub enum Entity<'a> {
     AssignedSequence((Variable<'a>, Sequence<'a>)),
     AssignedAction((Variable<'a>, Action<'a>)),
-    MidiBind((Pad, VariableName<'a>)),
     Statement(StatementType<'a>),
-    Directive(DirectiveType),
 }
 
 /// # Actions
@@ -99,17 +71,6 @@ pub enum Action<'a> {
 /// Type alias for the entire set of values needed to execute the code
 pub struct Script<'a> {
     variables: Variables<'a>,
-    midi_binds: MidiBinds<'a>,
-    directives: Directives,
-}
-
-impl Script<'_> {
-    /// Checks if midi directive is enabled
-    pub fn midi_enabled(self) -> bool {
-        self.directives
-            .iter()
-            .any(|dir| dir == &DirectiveType::Midi)
-    }
 }
 
 /// Executor for any action that it gets passed
@@ -174,9 +135,7 @@ fn interpret_sequence(sequence: &[Action], bridge: &HueBridge) {
 pub fn structure(entities: Entities, bridge: HueBridge) -> Script {
     use Entity::*;
     use StatementType::*;
-    let mut midi_binds = HashMap::new();
     let mut variables = HashMap::new();
-    let mut directives = Vec::new();
     for entity in entities {
         match entity {
             AssignedAction(((name, _), _)) => {
@@ -185,17 +144,9 @@ pub fn structure(entities: Entities, bridge: HueBridge) -> Script {
             AssignedSequence(((name, _), _)) => {
                 variables.insert(name, entity);
             }
-            MidiBind((pad, seq)) => {
-                midi_binds.insert(pad, seq);
-            }
             Statement(Trigger(which)) => execute_entities(&variables[which], &bridge),
-            Directive(directive) => directives.push(directive),
         }
     }
 
-    Script {
-        variables,
-        midi_binds,
-        directives,
-    }
+    Script { variables }
 }

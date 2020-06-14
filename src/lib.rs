@@ -1,5 +1,4 @@
 pub mod lshow;
-pub mod midi;
 pub mod parser;
 use parser::root;
 

@@ -1,7 +1,5 @@
 use super::lshow::*;
 use actions::action;
-use directives::directive;
-use midi_binds::mbind;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::character::complete::{
@@ -13,39 +11,6 @@ use nom::sequence::{delimited, pair, preceded, terminated, tuple};
 use nom::IResult;
 use sequences::sequence;
 use statements::trigger;
-
-/// Midi Binds
-mod midi_binds {
-    use super::{
-        alphanumeric1, helpers::*, map, preceded, tag, terminated, tuple, Entity, IResult,
-    };
-
-    pub fn mbind(i: &str) -> IResult<&str, Entity> {
-        let mbind_params = tuple((u8_digit_sp, alphanumeric1));
-        map(
-            terminated(preceded(tag("mbind "), mbind_params), colon),
-            Entity::MidiBind,
-        )(i)
-    }
-}
-
-/// File level directives
-mod directives {
-    use super::{
-        alphanumeric1, helpers::colon, map, preceded, tag, terminated, DirectiveType, Entity,
-        IResult,
-    };
-
-    /// Parse a #:>
-    pub fn dir_id(i: &str) -> IResult<&str, &str> {
-        tag("#:> ")(i)
-    }
-    /// Directive name
-    pub fn directive(i: &str) -> IResult<&str, Entity> {
-        let dir = |i| Entity::Directive(DirectiveType::from(i));
-        map(terminated(preceded(dir_id, alphanumeric1), colon), dir)(i)
-    }
-}
 
 /// Helper parsers
 mod helpers {
@@ -209,7 +174,7 @@ mod statements {
 /// Root parser for the whole documents
 pub fn root(i: &str) -> IResult<&str, Entities> {
     all_consuming(many0(terminated(
-        alt((trigger, sequence, action, directive, mbind)),
+        alt((trigger, sequence, action)),
         many0(newline),
     )))(i)
 }
