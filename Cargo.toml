@@ -9,3 +9,7 @@ edition = "2018"
 [dependencies]
 lighthouse = { git = "https://github.com/finnkauski/lighthouse" }
 nom = "5.1.1"
+
+[[bin]]
+name = "lshow"
+path = "src/main.rs"
