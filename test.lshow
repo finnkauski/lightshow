@@ -1,4 +1,3 @@
-#:> midi;
 c: seq = {
     color ff0000;
     wait 1;
@@ -6,4 +5,4 @@ c: seq = {
     wait 1;
     color 0000ff;
 };
-mbind 42 c;
+trigger c;
