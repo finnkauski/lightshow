@@ -28,7 +28,9 @@ lights can interpret and that I can later map to my drums.
 
 The following are example syntax for the language.
 
-### Individual actions
+### Syntax
+
+Generally - check out `example.lshow` for a sample script.
 
 - change color to the given hex color - `color <hex_color>`
 - blink lights - `blink <n_times> <pause_between> <hex_color>`
