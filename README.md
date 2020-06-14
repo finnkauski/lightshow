@@ -22,9 +22,8 @@ lights can interpret and that I can later map to my drums.
 
 ## Usage
 
-1. Clone the repository.
-2. `cargo install --git https://github.com/finnkauski/lightshow`
-3. `lshow ../path/to/file.lshow`
+1. `cargo install --git https://github.com/finnkauski/lightshow`
+2. `lshow ../path/to/file.lshow`
 
 The following are example syntax for the language.
 
